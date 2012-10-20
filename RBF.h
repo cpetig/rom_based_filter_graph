@@ -54,8 +54,7 @@ typedef struct timer_s
 #define define_timeout(NAME, MILLISECONDS) \
 	static unsigned NAME##_value= MILLISECONDS; \
 	static const timer_t NAME##_timer = \
-	{ &NAME##_value, 0, \
-	  NAME##_tasks_start, NAME##_tasks_end-NAME##_tasks_start }; \
+	{ &NAME##_value, 0, NAME##_tasks_start }; \
 	static timer_t const*const NAME##_timerentry \
 	 __attribute__((section(#NAME "_tasks"))) = NAME##_timer
 #define connect(OUTPUT,TASK) \
@@ -89,6 +88,8 @@ typedef struct timer_s
 void output_available_impl(task_t const*const* listeners);
 // main loop
 void schedule();
+// timer tick
+void tick_1ms();
 
 declare_source(void, idle_source);
 declare_source(void, program_start_src);
