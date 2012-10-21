@@ -29,24 +29,32 @@
 static task_t const* ready_list;
 //static task_t const* current;
 
+void enter_critical_section()
+{
+	// TODO: disable interrupts
+}
+
+void leave_critical_section()
+{
+	// TODO: reenable interrupts
+}
+
 void wake_process(task const* t)
 {
-	disable_irq();
+	enter_critical_section();
 	if (t->var->next==ADDR_PROCESSED)
 	{
 		task_t const* last= ready_list;
 		if (!last)
-		{
 			ready_list= t;
-			t->var->next=0;
-		}
 		else
 		{
 			while (last->var->next) last=last->var->next;
-			@@
+			last->var->next= t;
 		}
+		t->var->next=0;
 	}
-	enable_irq();
+	leave_critical_section();
 }
 
 void output_available_impl(task_t const*const* listeners)
@@ -60,19 +68,21 @@ void output_available_impl(task_t const*const* listeners)
 }
 
 // main loop
-void schedule()
+//void schedule()
+int main()
 {
 	output_available(program_start_src);
+
 	while (1)
 	{
 		task_t const* first= ready_list;
 		if (!!first)
 		{
-			disable_irq();
+			enter_critical_section();
 			first= ready_list;
 			ready_list= first->var->next;
 			first->var->next= ADDR_PROCESSED;
-			enable_irq();
+			leave_critical_section();
 
 			(*(first->fun))(first);
 		}
@@ -81,10 +91,27 @@ void schedule()
 			output_available(idle_source);
 		}
 	}
+	return 0;
 }
 
 // timer tick (increment all timers)
 void tick_1ms()
 {
+	extern timer_t const*const _timers_start[];
+	timer_t const*const* ptr= _timers_start;
+	while (!!*ptr)
+	{
+		if ((*ptr)->counter)
+		{
+			if ((*ptr)->counter==1)
+			{
+				(*ptr)->counter= (*ptr)->interval;
+				output_available_impl((*ptr)->listeners);
+			}
+			else
+				--((*ptr)->counter);
+		}
+		++ptr;
+	}
 }
 

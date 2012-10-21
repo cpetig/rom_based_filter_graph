@@ -50,13 +50,13 @@ typedef struct timer_s
 	{ &NAME##_value, MILLISECONDS, \
 	  NAME##_tasks_start }; \
 	static timer_t const*const NAME##_timerentry \
-	 __attribute__((section(#NAME "_tasks"))) = NAME##_timer
+	 __attribute__((section(".timers"))) = NAME##_timer
 #define define_timeout(NAME, MILLISECONDS) \
 	static unsigned NAME##_value= MILLISECONDS; \
 	static const timer_t NAME##_timer = \
 	{ &NAME##_value, 0, NAME##_tasks_start }; \
 	static timer_t const*const NAME##_timerentry \
-	 __attribute__((section(#NAME "_tasks"))) = NAME##_timer
+	 __attribute__((section(".timers"))) = NAME##_timer
 #define connect(OUTPUT,TASK) \
 	static task_t const*const OUTPUT##_##TASK##_entry \
 	 __attribute__((section(#OUTPUT "_tasks"))) = &TASK##_task
