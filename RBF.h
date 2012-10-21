@@ -24,7 +24,7 @@ typedef struct task_ram_s
 	struct task_s* next;
 } task_ram_t;
 
-typedef void (*task_fun_ptr_t)(struct task_s*);
+typedef void (*task_fun_ptr_t)(struct task_s const*);
 
 typedef struct task_s
 {
@@ -64,6 +64,9 @@ typedef struct timer_s
 	static task_ram_t NAME##_value; \
 	static const task_t NAME##_task = \
 	{ &NAME##_value, &FUNCTION }
+#define define_task3(NAME, FUNCTION, RAM) \
+	static const task_t NAME##_task = \
+	{ (task_ram_t*)&RAM, &FUNCTION }
 #define define_sink(NAME, FUNCTION) \
 	static task_ram_t NAME##_value; \
 	const task_t NAME##_task = \
