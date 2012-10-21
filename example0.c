@@ -16,6 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdio.h>
 #include "RBF.h"
 
 define_output(char,outp1);
@@ -32,7 +33,7 @@ static mytask_t generator_info;
 void generator_function(task_t const* t)
 {
 	char* o= &output_prepare(outp1);
-	char* i= ((mytask_t*)(t->ram))->next;
+	char* i= &((mytask_t*)(t->var))->next;
 	++*i;
 	if (*i>'Z') *i='A';
 	*o= *i;
@@ -42,9 +43,9 @@ void generator_function(task_t const* t)
 define_task3(generator, generator_function, generator_info);
 connect(timer1, generator);
 
-void printer_function(task_t const*)
+void printer_function(task_t const* t)
 {
-	printf("%c\n", *output_get(outp1));
+	printf("%c\n", output_get(outp1));
 }
 
 define_task(printer, printer_function);

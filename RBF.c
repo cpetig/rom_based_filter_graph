@@ -39,7 +39,7 @@ void leave_critical_section()
 	// TODO: reenable interrupts
 }
 
-void wake_process(task const* t)
+void wake_process(task_t const* t)
 {
 	enter_critical_section();
 	if (t->var->next==ADDR_PROCESSED)
@@ -97,19 +97,19 @@ int main()
 // timer tick (increment all timers)
 void tick_1ms()
 {
-	extern timer_t const*const _timers_start[];
-	timer_t const*const* ptr= _timers_start;
+	extern RBF_timer_t const*const _timers_start[];
+	RBF_timer_t const*const* ptr= _timers_start;
 	while (!!*ptr)
 	{
 		if ((*ptr)->counter)
 		{
-			if ((*ptr)->counter==1)
+			if ((*(*ptr)->counter)==1)
 			{
-				(*ptr)->counter= (*ptr)->interval;
+				*(*ptr)->counter= (*ptr)->interval;
 				output_available_impl((*ptr)->listeners);
 			}
 			else
-				--((*ptr)->counter);
+				--(*(*ptr)->counter);
 		}
 		++ptr;
 	}
