@@ -47,7 +47,7 @@ typedef struct timer_s
 	NAME##_type NAME##_value
 #define define_interval_timer(NAME,MILLISECONDS) \
 	extern task_t const*const NAME##_tasks_start[]; \
-	static unsigned NAME##_value= MILLISECONDS; \
+	static timer_counter_t NAME##_value= MILLISECONDS; \
 	static const RBF_timer_t NAME##_timer = \
 	{ &NAME##_value, MILLISECONDS, \
 	  NAME##_tasks_start }; \
@@ -55,7 +55,7 @@ typedef struct timer_s
 	 __attribute__((section(".timers"))) = &NAME##_timer
 #define define_timeout(NAME, MILLISECONDS) \
 	extern task_t const*const NAME##_tasks_start[]; \
-	static unsigned NAME##_value= MILLISECONDS; \
+	static timer_counter_t NAME##_value= MILLISECONDS; \
 	static const RBF_timer_t NAME##_timer = \
 	{ &NAME##_value, 0, NAME##_tasks_start }; \
 	static RBF_timer_t const*const NAME##_timerentry \
