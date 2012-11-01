@@ -10,10 +10,10 @@ OBJSIZE		= $(MSP_PREFIX)/bin/msp430-size
 
 NAME=example0
 
-all: $(NAME).elf $(NAME).lst
+all: $(NAME).elf $(NAME).lst $(NAME).hex
 
 clean:
-	rm $(NAME) *.o
+	rm $(NAME).elf *.o $(NAME).lst $(NAME).hex $(NAME).map *~
 
 $(NAME).elf: $(NAME).o RBF.o msp_timer.o msp_putchar.o
 	$(CC) -o $@ ${CFLAGS} $^ -Wl,$(NAME)_msp.lds -Wl,-Map=$(NAME).map

@@ -52,17 +52,17 @@ typedef struct timer_s
 	{ &NAME##_value, MILLISECONDS, \
 	  NAME##_tasks_start }; \
 	static RBF_timer_t const*const NAME##_timerentry \
-	 __attribute__((section(".timers"))) = &NAME##_timer
+	 __attribute__((section(".timers"),used)) = &NAME##_timer
 #define define_timeout(NAME, MILLISECONDS) \
 	extern task_t const*const NAME##_tasks_start[]; \
 	static unsigned NAME##_value= MILLISECONDS; \
 	static const RBF_timer_t NAME##_timer = \
 	{ &NAME##_value, 0, NAME##_tasks_start }; \
 	static RBF_timer_t const*const NAME##_timerentry \
-	 __attribute__((section(".timers"))) = &NAME##_timer
+	 __attribute__((section(".timers"),used)) = &NAME##_timer
 #define connect(OUTPUT,TASK) \
 	static task_t const*const OUTPUT##_##TASK##_entry \
-	 __attribute__((section(#OUTPUT "_tasks"))) = &TASK##_task
+	 __attribute__((section(#OUTPUT "_tasks"),used)) = &TASK##_task
 #define define_task(NAME, FUNCTION) \
 	static task_ram_t NAME##_value; \
 	static const task_t NAME##_task = \
