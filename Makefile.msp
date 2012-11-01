@@ -16,7 +16,7 @@ clean:
 	rm $(NAME) *.o
 
 $(NAME).elf: $(NAME).o RBF.o msp_timer.o msp_putchar.o
-	$(CC) -o $@ ${CFLAGS} $^ -Wl,$(NAME).lds -Wl,-Map=$(NAME).map
+	$(CC) -o $@ ${CFLAGS} $^ -Wl,$(NAME)_msp.lds -Wl,-Map=$(NAME).map
 
 ${NAME}.lst: ${NAME}.elf
 	${OBJDUMP} -dSt $^ >$@
