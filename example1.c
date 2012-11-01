@@ -22,25 +22,30 @@
 define_output(char,outp1);
 define_interval_timer(timer1,33);
 
-static char next = '@';
+typedef struct mytask_s
+{
+	task_ram_t task;
+	char next;
+} mytask_t;
+
+static mytask_t generator_info = { TASK_RAM_T_INIT_VALUE, '@' };
 
 void generator_function(task_t const* t)
 {
 	char* o= &output_prepare(outp1);
-	++next;
-	if (next>'Z') next='A';
-	*o= next;
+	char* i= &((mytask_t*)(t->var))->next;
+	++*i;
+	if (*i>'Z') *i='A';
+	*o= *i;
 	output_available(outp1);
 }
 
-define_task(generator, generator_function);
+define_task3(generator, generator_function, generator_info);
 connect(timer1, generator);
 
 void printer_function(task_t const* t)
 {
-    putchar(output_get(outp1));
-    putchar('\n');
-//	printf("%c\n", output_get(outp1));
+	printf("%c\n", output_get(outp1));
 }
 
 define_task(printer, printer_function);

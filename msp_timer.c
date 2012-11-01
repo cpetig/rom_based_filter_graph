@@ -16,33 +16,26 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdio.h>
 #include "RBF.h"
+#include "msp430x552x.h"
+#include <signal.h>
 
-define_output(char,outp1);
-define_interval_timer(timer1,33);
+extern void tick_1ms();
 
-static char next = '@';
-
-void generator_function(task_t const* t)
+interrupt(TIMER1_A0_VECTOR) itimer_cb(void)
 {
-	char* o= &output_prepare(outp1);
-	++next;
-	if (next>'Z') next='A';
-	*o= next;
-	output_available(outp1);
+  tick_1ms();
+  TA1IV;
 }
 
-define_task(generator, generator_function);
-connect(timer1, generator);
-
-void printer_function(task_t const* t)
+static void start_msp_timer()
 {
-    putchar(output_get(outp1));
-    putchar('\n');
-//	printf("%c\n", output_get(outp1));
+  TA1EX0= 0; // no divider
+  TA1CTL= (TASSEL_1 | MC_2 | TACLR ); // up mode
+  TA1CCR1= 300; // 1ms, value not verified
+  TA1CCTL1= 0;
+  TA1CCTL0 = 0;
 }
 
-define_task(printer, printer_function);
-connect(outp1, printer);
-
+define_task(start_timer, start_msp_timer);
+connect(program_start_src, start_timer);

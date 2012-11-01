@@ -1,29 +1,28 @@
 SECTIONS
 {
     .rbf_structs : {
-	. = NEXT(4);
+	. = NEXT(2);
 	__timers_start = .;
 	_timers_start = .;
 	*(.timers)
-	LONG(0)
+	SHORT(0)
 
 	_program_start_src_tasks_start = .;
 	program_start_src_tasks_start = .;
 	*(program_start_src_tasks)
-	LONG(0)
+	SHORT(0)
 	_idle_source_tasks_start = .;
 	idle_source_tasks_start = .;
 	*(idle_source_tasks)
-	LONG(0)
+	SHORT(0)
 
 	_outp1_tasks_start = .;
 	outp1_tasks_start = .;
 	*(outp1_tasks)
-	LONG(0)
-
+	SHORT(0)
 	_timer1_tasks_start = .;
 	timer1_tasks_start = .;
 	*(timer1_tasks)
-	LONG(0)
-    }
+	SHORT(0)
+    } >rom
 }

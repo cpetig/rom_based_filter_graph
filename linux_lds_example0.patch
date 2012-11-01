@@ -1,0 +1,53 @@
+--- linux.lds	2012-11-01 13:24:09.885404929 +0100
++++ example0_linux.lds	2012-11-01 13:25:58.137407385 +0100
+@@ -1,13 +1,3 @@
+-GNU ld (GNU Binutils for Ubuntu) 2.22.90.20120924
+-  Supported emulations:
+-   elf_i386
+-   i386linux
+-   elf32_x86_64
+-   elf_x86_64
+-   elf_l1om
+-   elf_k1om
+-using internal linker script:
+-==================================================
+ /* Script for -z combreloc: combine and sort reloc sections */
+ OUTPUT_FORMAT("elf32-i386", "elf32-i386",
+ 	      "elf32-i386")
+@@ -65,6 +55,31 @@
+     /* .gnu.warning sections are handled specially by elf32.em.  */
+     *(.gnu.warning)
+   }
++    .rbf_structs : {
++	. = NEXT(4);
++	__timers_start = .;
++	_timers_start = .;
++	*(.timers)
++	LONG(0)
++
++	_program_start_src_tasks_start = .;
++	program_start_src_tasks_start = .;
++	*(program_start_src_tasks)
++	LONG(0)
++	_idle_source_tasks_start = .;
++	idle_source_tasks_start = .;
++	*(idle_source_tasks)
++	LONG(0)
++
++	_outp1_tasks_start = .;
++	outp1_tasks_start = .;
++	*(outp1_tasks)
++	LONG(0)
++	_timer1_tasks_start = .;
++	timer1_tasks_start = .;
++	*(timer1_tasks)
++	LONG(0)
++    }
+   .fini           :
+   {
+     KEEP (*(SORT_NONE(.fini)))
+@@ -216,4 +231,3 @@
+ }
+ 
+ 
+-==================================================

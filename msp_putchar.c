@@ -16,33 +16,30 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdio.h>
+// output character to serial device
+
 #include "RBF.h"
+#include "msp430x552x.h"
+#include <signal.h>
 
-define_output(char,outp1);
-define_interval_timer(timer1,33);
-
-static char next = '@';
-
-void generator_function(task_t const* t)
+int putchar(int x)
 {
-	char* o= &output_prepare(outp1);
-	++next;
-	if (next>'Z') next='A';
-	*o= next;
-	output_available(outp1);
+  UCA1TXBUF=x; // next_byte_into_tx_reg
+  while ((UCA1IFG & UCTXIFG)==0); // wait_transmitter_empty
+  return x&0xff;
 }
 
-define_task(generator, generator_function);
-connect(timer1, generator);
-
-void printer_function(task_t const* t)
+static void start_msp_serial()
 {
-    putchar(output_get(outp1));
-    putchar('\n');
-//	printf("%c\n", output_get(outp1));
+  P4SEL |= (BIT4 | BIT5);
+  UCA1CTL1= UCSSEL_2 | UCSWRST;
+  UCA1CTL0= UCMODE0;
+  UCA1BRW= 138;// 69; // Table 26-4
+  UCA1MCTL= UCBRS_7;
+  UCA1IE= 0;
+  UCA1IE |= UCRXIE;
+  UCA1CTL1 &= ~UCSWRST;
 }
 
-define_task(printer, printer_function);
-connect(outp1, printer);
-
+define_task(start_serial, start_msp_serial);
+connect(program_start_src, start_serial);

@@ -22,7 +22,6 @@
 //define_event(program_start_src);
 
 #define ADDR_READY 0 /* and any other valid addresses */
-#define ADDR_PROCESSED ((task_t*)1)
 //#define ADDR_RUNNING 2
 //#define ADDR_KILLED 3
 

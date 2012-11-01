@@ -16,33 +16,30 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdio.h>
 #include "RBF.h"
+#include <signal.h>
+#include <string.h>
+#include <sys/time.h>
 
-define_output(char,outp1);
-define_interval_timer(timer1,33);
+extern void tick_1ms();
 
-static char next = '@';
-
-void generator_function(task_t const* t)
+static void itimer_cb(int num)
 {
-	char* o= &output_prepare(outp1);
-	++next;
-	if (next>'Z') next='A';
-	*o= next;
-	output_available(outp1);
+  tick_1ms();
 }
 
-define_task(generator, generator_function);
-connect(timer1, generator);
-
-void printer_function(task_t const* t)
+static void start_linux_timer()
 {
-    putchar(output_get(outp1));
-    putchar('\n');
-//	printf("%c\n", output_get(outp1));
+  struct sigaction sa;
+  memset(&sa,0,sizeof sa);
+  sa.sa_handler=&itimer_cb;
+  sigaction(SIGALRM, &sa, 0);   
+  struct itimerval itv;
+  memset(&itv,0,sizeof itv);
+  itv.it_interval.tv_usec=1000;
+  itv.it_value.tv_usec=1000;   
+  setitimer(ITIMER_REAL, &itv, 0);
 }
 
-define_task(printer, printer_function);
-connect(outp1, printer);
-
+define_task(start_timer, start_linux_timer);
+connect(program_start_src, start_timer);
