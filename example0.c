@@ -28,7 +28,7 @@ typedef struct mytask_s
 	char next;
 } mytask_t;
 
-static mytask_t generator_info;
+static mytask_t generator_info = { TASK_RAM_T_INIT_VALUE, '@' };
 
 void generator_function(task_t const* t)
 {

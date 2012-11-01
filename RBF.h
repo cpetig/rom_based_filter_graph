@@ -24,6 +24,10 @@ typedef struct task_ram_s
 	struct task_s const* next;
 } task_ram_t;
 
+// initialize next to this value (0 means last of the ready list)
+#define ADDR_PROCESSED ((task_t*)1)
+#define TASK_RAM_T_INIT_VALUE { ADDR_PROCESSED }
+
 typedef void (*task_fun_ptr_t)(struct task_s const*);
 
 typedef struct task_s
@@ -64,7 +68,7 @@ typedef struct timer_s
 	static task_t const*const OUTPUT##_##TASK##_entry \
 	 __attribute__((section(#OUTPUT "_tasks"),used)) = &TASK##_task
 #define define_task(NAME, FUNCTION) \
-	static task_ram_t NAME##_value; \
+	static task_ram_t NAME##_value = TASK_RAM_T_INIT_VALUE; \
 	static const task_t NAME##_task = \
 	{ &NAME##_value, &FUNCTION }
 #define define_task3(NAME, FUNCTION, RAM) \
