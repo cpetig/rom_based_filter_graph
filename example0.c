@@ -38,7 +38,9 @@ connect(timer1, generator);
 
 void printer_function(task_t const* t)
 {
-	printf("%c\n", output_get(outp1));
+    putchar(output_get(outp1));
+    putchar('\n');
+//	printf("%c\n", output_get(outp1));
 }
 
 define_task(printer, printer_function);
