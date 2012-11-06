@@ -45,55 +45,65 @@ typedef struct timer_s
 	task_t const*const* listeners; // null terminated list
 } RBF_timer_t;
 
-#define define_output(TYPE,NAME) \
-	extern task_t const*const NAME##_tasks_start[]; \
-	typedef TYPE NAME##_type; \
-	NAME##_type NAME##_value
-#define define_interval_timer(NAME,MILLISECONDS) \
-	extern task_t const*const NAME##_tasks_start[]; \
-	static timer_counter_t NAME##_value= MILLISECONDS; \
-	static const RBF_timer_t NAME##_timer = \
-	{ &NAME##_value, MILLISECONDS, \
-	  NAME##_tasks_start }; \
-	static RBF_timer_t const*const NAME##_timerentry \
-	 __attribute__((section(".timers"),used)) = &NAME##_timer
-#define define_timeout(NAME, MILLISECONDS) \
-	extern task_t const*const NAME##_tasks_start[]; \
-	static timer_counter_t NAME##_value= MILLISECONDS; \
-	static const RBF_timer_t NAME##_timer = \
-	{ &NAME##_value, 0, NAME##_tasks_start }; \
-	static RBF_timer_t const*const NAME##_timerentry \
-	 __attribute__((section(".timers"),used)) = &NAME##_timer
-#define connect(OUTPUT,TASK) \
-	static task_t const*const OUTPUT##_##TASK##_entry \
-	 __attribute__((section(#OUTPUT "_tasks"),used)) = &TASK##_task
-#define define_task(NAME, FUNCTION) \
-	static task_ram_t NAME##_value = TASK_RAM_T_INIT_VALUE; \
-	static const task_t NAME##_task = \
-	{ &NAME##_value, &FUNCTION }
-#define define_task3(NAME, FUNCTION, RAM) \
-	static const task_t NAME##_task = \
-	{ (task_ram_t*)&RAM, &FUNCTION }
-#define define_sink(NAME, FUNCTION) \
-	static task_ram_t NAME##_value; \
-	const task_t NAME##_task = \
-	{ &NAME##_value, &FUNCTION }
+// internal macros
+#define _ROM_table_import_addr(NAME,TYPENAME,CTYPE) \
+	extern CTYPE const*const NAME##_##TYPENAME##_start[]
+#define _ROM_table_addr(NAME,TYPENAME) \
+	NAME##_##TYPENAME##_start
+#define _ROM_table_entry(NAME,TYPENAME,CTYPE,ENTRYNAME,SECTION) \
+	static CTYPE const*const ENTRYNAME##entry \
+	 __attribute__((section(SECTION),used)) = &NAME##_##TYPENAME
 
-#define output_available(NAME) output_available_impl(NAME##_tasks_start)
+#define _define_RBF_timer(NAME,MILLISECONDS,RELOAD) \
+	_ROM_table_import_addr(NAME,tasks,task_t); \
+	static timer_counter_t NAME##_value= MILLISECONDS; \
+	static const RBF_timer_t NAME##_timer = \
+	{ &NAME##_value, RELOAD, \
+	  _ROM_table_addr(NAME,tasks) }; \
+	_ROM_table_entry(NAME,timer,RBF_timer_t,NAME##_timer,".timers")
+
+#define _define_task4(STORAGE, NAME, FUNCTION, RAM) \
+	STORAGE const task_t NAME##_task = \
+	{ (task_ram_t*)&RAM, &FUNCTION }
+#define _define_task_i3(STORAGE, NAME, FUNCTION) \
+	static task_ram_t NAME##_value = TASK_RAM_T_INIT_VALUE; \
+	_define_task4(STORAGE, NAME, FUNCTION, NAME##_value)
+
+// public macros
+#define define_output(TYPE,NAME) \
+		_ROM_table_import_addr(NAME,tasks,task_t); \
+		typedef TYPE NAME##_type; \
+		NAME##_type NAME##_value
+#define define_interval_timer(NAME,MILLISECONDS) \
+		_define_RBF_timer(NAME,MILLISECONDS,MILLISECONDS)
+#define define_timeout(NAME, MILLISECONDS) \
+		_define_RBF_timer(NAME,MILLISECONDS,0)
+
+#define connect(OUTPUT,TASK) \
+		_ROM_table_entry(TASK,task,task_t,OUTPUT##_##TASK,#OUTPUT"_tasks")
+
+#define define_task3(NAME, FUNCTION, RAM) \
+		_define_task4(static, NAME, FUNCTION, RAM)
+#define define_task(NAME, FUNCTION) \
+		_define_task_i3(static, NAME, FUNCTION)
+#define define_sink(NAME, FUNCTION) \
+		_define_task_i3(, NAME, FUNCTION)
+
+#define output_available(NAME) output_available_impl(_ROM_table_addr(NAME,tasks))
 #define output_prepare(NAME) NAME##_value
 #define output_get(NAME) NAME##_value
 #define output_ref(NAME) &NAME##_value
 #define output_unref(NAME,PTR) ((void)0)
 #define declare_source(TYPE,NAME) \
-	extern task_t const*const NAME##_tasks_start[]; \
-	typedef TYPE NAME##_type; \
-	extern NAME##_type NAME##_value
+		_ROM_table_import_addr(NAME,tasks,task_t); \
+		typedef TYPE NAME##_type; \
+		extern NAME##_type NAME##_value
 #define declare_sink(NAME) \
-	extern const task_t NAME##_task
+		extern const task_t NAME##_task
 #define stop_timer(NAME) \
-	NAME##_value= 0
+		NAME##_value= 0
 #define restart_timer(NAME, MILLISECONDS) \
-	NAME##_value= MILLISECONDS
+		NAME##_value= MILLISECONDS
 
 // TODO: add more arguments for buffered output support
 void output_available_impl(task_t const*const* listeners);
