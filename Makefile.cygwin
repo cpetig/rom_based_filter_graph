@@ -7,10 +7,6 @@ OBJECTS=example0.o RBF.o linux_timer.o
 clean:
 	rm example0 *.o
 
-example0_cygwin.lds: cygwin_lds_example0.patch
-	$(LD) --verbose >example0_cygwin.lds
-	patch <cygwin_lds_example0.patch
-
 example0: $(OBJECTS) example0_cygwin.lds
-	$(CC) -o $@ $(OBJECTS) -Wl,-T -Wl,example0_cygwin.lds -Wl,-Map=example0.map
+	$(CC) -o $@ $(OBJECTS) -Wl,-Map=example0.map
 

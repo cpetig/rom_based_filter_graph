@@ -18,8 +18,8 @@
 
 #include "RBF.h"
 
-//define_event(idle_source);
-//define_event(program_start_src);
+define_event(idle_source);
+define_event(program_start_src);
 
 #define ADDR_READY 0 /* and any other valid addresses */
 //#define ADDR_RUNNING 2
@@ -93,11 +93,12 @@ int main()
 	return 0;
 }
 
+_ROM_table_define_addr(RBF_timer_t, timers);
+
 // timer tick (increment all timers)
 void tick_1ms()
 {
-	extern RBF_timer_t const*const _timers_start[];
-	RBF_timer_t const*const* ptr= _timers_start;
+	RBF_timer_t const*const* ptr= _ROM_table_addr(timers);
 	while (!!*ptr)
 	{
 		if ((*ptr)->counter)
@@ -113,4 +114,7 @@ void tick_1ms()
 		++ptr;
 	}
 }
+
+static void const*const RBF_end_entry 
+	__attribute__((section(".text$RBFz"),used)) = 0;
 

@@ -46,21 +46,34 @@ typedef struct timer_s
 } RBF_timer_t;
 
 // internal macros
-#define _ROM_table_import_addr(NAME,TYPENAME,CTYPE) \
-	extern CTYPE const*const NAME##_##TYPENAME##_start[]
-#define _ROM_table_addr(NAME,TYPENAME) \
-	NAME##_##TYPENAME##_start
-#define _ROM_table_entry(NAME,TYPENAME,CTYPE,ENTRYNAME,SECTION) \
+#if 0 // old style: manual linker script
+#define _ROM_table_import_addr(CTYPE,SECTION) \
+	extern CTYPE const*const SECTION##_start[]
+#define _ROM_table_addr(SECTION) \
+	SECTION##_start
+#define _ROM_table_entry(NAME,CATEGORY,CTYPE,ENTRYNAME,SECTION) \
 	static CTYPE const*const ENTRYNAME##entry \
-	 __attribute__((section(SECTION),used)) = &NAME##_##TYPENAME
+	 __attribute__((section(SECTION),used)) = &NAME##_##CATEGORY
+#else
+#define _ROM_table_define_addr(CTYPE,SECTION) \
+	CTYPE const*const RBF_##SECTION##_start[1] \
+	 __attribute__((section(".text$RBF_"#SECTION"0"),used)) = { 0 }
+#define _ROM_table_import_addr(CTYPE,SECTION) \
+	extern CTYPE const*const RBF_##SECTION##_start[]
+#define _ROM_table_addr(SECTION) \
+	(RBF_##SECTION##_start+1)
+#define _ROM_table_entry(NAME,CATEGORY,CTYPE,ENTRYNAME,SECTION) \
+	static CTYPE const*const ENTRYNAME##entry \
+	 __attribute__((section(".text$RBF_"#SECTION"1"),used)) = &NAME##_##CATEGORY
+#endif
 
 #define _define_RBF_timer(NAME,MILLISECONDS,RELOAD) \
-	_ROM_table_import_addr(NAME,tasks,task_t); \
+	_ROM_table_define_addr(task_t,NAME##_tasks); \
 	static timer_counter_t NAME##_value= MILLISECONDS; \
 	static const RBF_timer_t NAME##_timer = \
 	{ &NAME##_value, RELOAD, \
-	  _ROM_table_addr(NAME,tasks) }; \
-	_ROM_table_entry(NAME,timer,RBF_timer_t,NAME##_timer,".timers")
+	  _ROM_table_addr(NAME##_tasks) }; \
+	_ROM_table_entry(NAME,timer,RBF_timer_t,NAME##_timer,timers)
 
 #define _define_task4(STORAGE, NAME, FUNCTION, RAM) \
 	STORAGE const task_t NAME##_task = \
@@ -71,31 +84,35 @@ typedef struct timer_s
 
 // public macros
 #define define_output(TYPE,NAME) \
-		_ROM_table_import_addr(NAME,tasks,task_t); \
+		_ROM_table_define_addr(task_t,NAME##_tasks); \
 		typedef TYPE NAME##_type; \
 		NAME##_type NAME##_value
+#define define_event(NAME) /* void type output */ \
+		_ROM_table_define_addr(task_t,NAME##_tasks)
 #define define_interval_timer(NAME,MILLISECONDS) \
 		_define_RBF_timer(NAME,MILLISECONDS,MILLISECONDS)
 #define define_timeout(NAME, MILLISECONDS) \
 		_define_RBF_timer(NAME,MILLISECONDS,0)
 
 #define connect(OUTPUT,TASK) \
-		_ROM_table_entry(TASK,task,task_t,OUTPUT##_##TASK,#OUTPUT"_tasks")
+		_ROM_table_entry(TASK,task,task_t,OUTPUT##_##TASK,OUTPUT##_tasks)
 
 #define define_task3(NAME, FUNCTION, RAM) \
 		_define_task4(static, NAME, FUNCTION, RAM)
 #define define_task(NAME, FUNCTION) \
 		_define_task_i3(static, NAME, FUNCTION)
+// a sink is a globally accessible task
 #define define_sink(NAME, FUNCTION) \
 		_define_task_i3(, NAME, FUNCTION)
 
-#define output_available(NAME) output_available_impl(_ROM_table_addr(NAME,tasks))
+#define output_available(NAME) output_available_impl(_ROM_table_addr(NAME##_tasks))
 #define output_prepare(NAME) NAME##_value
 #define output_get(NAME) NAME##_value
 #define output_ref(NAME) &NAME##_value
 #define output_unref(NAME,PTR) ((void)0)
+
 #define declare_source(TYPE,NAME) \
-		_ROM_table_import_addr(NAME,tasks,task_t); \
+		_ROM_table_import_addr(task_t,NAME##_tasks); \
 		typedef TYPE NAME##_type; \
 		extern NAME##_type NAME##_value
 #define declare_sink(NAME) \
