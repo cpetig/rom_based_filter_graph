@@ -46,23 +46,15 @@ typedef struct timer_s
 } RBF_timer_t;
 
 // internal macros
-#if 0 // old style: manual linker script
-#define _ROM_table_import_addr(CTYPE,SECTION) \
-	extern CTYPE const*const SECTION##_start[]
-#define _ROM_table_addr(SECTION) \
-	SECTION##_start
-#define _ROM_table_entry(NAME,CATEGORY,CTYPE,ENTRYNAME,SECTION) \
-	static CTYPE const*const ENTRYNAME##entry \
-	 __attribute__((section(SECTION),used)) = &NAME##_##CATEGORY
-#else
-#define _ROM_table_define_addr(CTYPE,SECTION) \
+#ifdef __GNUC__
+# define _ROM_table_define_addr(CTYPE,SECTION) \
 	CTYPE const*const RBF_##SECTION##_start[1] \
 	 __attribute__((section(".text$RBF_"#SECTION"0"),used)) = { 0 }
-#define _ROM_table_import_addr(CTYPE,SECTION) \
+# define _ROM_table_import_addr(CTYPE,SECTION) \
 	extern CTYPE const*const RBF_##SECTION##_start[]
-#define _ROM_table_addr(SECTION) \
+# define _ROM_table_addr(SECTION) \
 	(RBF_##SECTION##_start+1)
-#define _ROM_table_entry(NAME,CATEGORY,CTYPE,ENTRYNAME,SECTION) \
+# define _ROM_table_entry(NAME,CATEGORY,CTYPE,ENTRYNAME,SECTION) \
 	static CTYPE const*const ENTRYNAME##entry \
 	 __attribute__((section(".text$RBF_"#SECTION"1"),used)) = &NAME##_##CATEGORY
 #endif
