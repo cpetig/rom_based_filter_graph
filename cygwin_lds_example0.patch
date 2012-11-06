@@ -1,5 +1,5 @@
---- cygwin.lds	2012-11-06 19:55:38.734375000 +0100
-+++ example0_cygwin.lds	2012-11-06 19:54:48.406250000 +0100
+--- example0_cygwin.lds	2012-11-06 19:55:38.734375000 +0100
++++ example0_cygwin.lds	2012-11-06 20:16:46.515625000 +0100
 @@ -1,8 +1,3 @@
 -GNU ld (GNU Binutils) 2.22.52.20120326
 -  Supported emulations:
@@ -9,11 +9,11 @@
  /* Script for ld --enable-auto-import: Like the default script except read only data is placed into .data  */
  OUTPUT_FORMAT(pei-i386)
  SEARCH_DIR("/usr/i686-cygwin/lib"); SEARCH_DIR("/usr/lib"); SEARCH_DIR("/usr/lib/w32api");
-@@ -18,6 +13,31 @@
+@@ -18,6 +13,30 @@
      *(.text)
      *(SORT(.text$*))
       *(.text.*)
-+    .rbf_structs : {
++
 +	. = NEXT(4);
 +	__timers_start = .;
 +	_timers_start = .;
@@ -37,11 +37,10 @@
 +	timer1_tasks_start = .;
 +	*(timer1_tasks)
 +	LONG(0)
-+    }
       *(.gnu.linkonce.t.*)
      *(.glue_7t)
      *(.glue_7)
-@@ -230,6 +250,3 @@
+@@ -230,6 +249,3 @@
      *(.debug_types .gnu.linkonce.wt.*)
    }
  }
