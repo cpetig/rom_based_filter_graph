@@ -124,3 +124,16 @@ void tick_1ms();
 declare_source(void, idle_source);
 declare_source(void, program_start_src);
 
+typedef unsigned char rbf_buffer_index_t;
+#define define_output_buffer(TYPE,NAME,SIZE) \
+		_ROM_table_define_addr(task_t,NAME##_tasks); \
+		_ROM_table_define_addr(rbf_buffer_index_t,NAME##_readers); \
+		typedef TYPE NAME##_type; \
+		static const rbf_buffer_index_t NAME##_max = SIZE; \
+		static rbf_buffer_index_t NAME##_writeptr = SIZE; \
+		NAME##_type NAME##_values[SIZE]
+#define output_buffer_available(NAME) output_available_impl(_ROM_table_addr(NAME##_tasks))
+#define output_buffer_prepare(NAME) \
+	(output_buffer_prepare_impl(&NAME##_writeptr, NAME##_max, _ROM_table_addr(NAME##_readers)), \
+	 NAME##_value[NAME##_writeptr])
+
