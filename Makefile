@@ -1,12 +1,18 @@
 CFLAGS=-O0 -g
 
-all: example0
+all: example0 example1 example2
 
-OBJECTS=example0.o RBF.o linux_timer.o
+COMMONOBJECTS=RBF.o linux_timer.o
 
 clean:
 	rm example0 *.o
 
-example0: $(OBJECTS) example0_cygwin.lds
-	$(CC) -o $@ $(OBJECTS) -Wl,-Map=example0.map
+example0: example0.o $(COMMONOBJECTS) 
+	$(CC) -o $@ $^ -Wl,-Map=example0.map
+
+example1: example1.o $(COMMONOBJECTS) 
+	$(CC) -o $@ $^
+
+example2: example2.o $(COMMONOBJECTS) 
+	$(CC) -o $@ $^
 

@@ -8,3 +8,4 @@ example0.map
 *.lst
 example0_linux.lds
 /example0_cygwin.lds
+/*.exe
