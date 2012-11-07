@@ -75,12 +75,12 @@ typedef struct timer_s
 	_define_task4(STORAGE, NAME, FUNCTION, NAME##_value)
 
 // public macros
-#define define_output(TYPE,NAME) \
-		_ROM_table_define_addr(task_t,NAME##_tasks); \
-		typedef TYPE NAME##_type; \
-		NAME##_type NAME##_value
 #define define_event(NAME) /* void type output */ \
 		_ROM_table_define_addr(task_t,NAME##_tasks)
+#define define_output(TYPE,NAME) \
+		define_event(NAME); \
+		typedef TYPE NAME##_type; \
+		NAME##_type NAME##_value
 #define define_interval_timer(NAME,MILLISECONDS) \
 		_define_RBF_timer(NAME,MILLISECONDS,MILLISECONDS)
 #define define_timeout(NAME, MILLISECONDS) \
@@ -103,8 +103,10 @@ typedef struct timer_s
 //#define output_ref(NAME) &NAME##_value
 //#define output_unref(NAME,PTR) ((void)0)
 
+#define declare_event(NAME) \
+		_ROM_table_import_addr(task_t,NAME##_tasks)
 #define declare_source(TYPE,NAME) \
-		_ROM_table_import_addr(task_t,NAME##_tasks); \
+		declare_event(NAME); \
 		typedef TYPE NAME##_type; \
 		extern NAME##_type NAME##_value
 #define declare_sink(NAME) \
@@ -124,60 +126,55 @@ void tick_1ms();
 int RBF_enter_critical_section();
 void RBF_leave_critical_section(int); // pass the value received by enter
 
-declare_source(void, idle_source);
-declare_source(void, program_start_src);
+declare_event(idle_source);
+declare_event(program_start_src);
 
 typedef unsigned char rbf_buffer_index_t;
 
-#if 0
+// these structures keep the number of arguments for prepare+available down
 typedef struct buffer_ram_s
 {
-	rbf_buffer_index_t availptr;
-	rbf_buffer_index_t writeptr;
+	rbf_buffer_index_t avail_idx;
+	rbf_buffer_index_t write_idx;
 } buffer_ram_t;
 
 typedef struct buffer_s
 {
-	buffer_ram_t *const var;
-	rbf_buffer_index_t *const*const readptrs;
+	buffer_ram_t volatile*const var;
+	rbf_buffer_index_t volatile*const*const readptrs;
 	task_t const*const*const listeners;
 	const rbf_buffer_index_t max;
 } buffer_t;
-#endif
 
 #define RBF_outbuf_invalid ((rbf_buffer_index_t)-1)
 #define define_output_buffer(TYPE,NAME,SIZE) \
 		_ROM_table_define_addr(task_t,NAME##_tasks); \
-		_ROM_table_define_addr(rbf_buffer_index_t,NAME##_readptrs); \
+		_ROM_table_define_addr(volatile rbf_buffer_index_t,NAME##_readptrs); \
 		typedef TYPE NAME##_type; \
-		static const rbf_buffer_index_t NAME##_max = SIZE; \
-		static rbf_buffer_index_t NAME##_writeptr = RBF_outbuf_invalid; \
-		volatile rbf_buffer_index_t NAME##_availptr = RBF_outbuf_invalid; \
-		NAME##_type NAME##_values[SIZE]
+		NAME##_type NAME##_values[SIZE]; \
+		volatile buffer_ram_t NAME##_usage = \
+		{ RBF_outbuf_invalid,RBF_outbuf_invalid }; \
+		static const buffer_t NAME##_properties = \
+		{ &NAME##_usage, (volatile rbf_buffer_index_t*const*)_ROM_table_addr(NAME##_readptrs), _ROM_table_addr(NAME##_tasks), SIZE }
 
 #define output_buffer_available(NAME) \
-	(output_buffer_available_impl(_ROM_table_addr(NAME##_tasks), &NAME##_availptr, NAME##_max, _ROM_table_addr(NAME##_readptrs)), \
-	 NAME##_writeptr=RBF_outbuf_invalid)
+	output_buffer_available_impl(&NAME##_properties)
 #define output_buffer_prepare(NAME) \
-	(NAME##_values[output_buffer_prepare_impl(&NAME##_writeptr, NAME##_availptr, NAME##_max, _ROM_table_addr(NAME##_readptrs))])
+	(NAME##_values[output_buffer_prepare_impl(&NAME##_properties)])
 
-void output_buffer_available_impl(task_t const*const* listeners, rbf_buffer_index_t volatile* avail, 
-			rbf_buffer_index_t max, rbf_buffer_index_t const*const* readptrs);
-rbf_buffer_index_t output_buffer_prepare_impl(rbf_buffer_index_t* write, rbf_buffer_index_t avail, 
-			rbf_buffer_index_t max, rbf_buffer_index_t const*const* readptrs);
-
-/*_ROM_table_entry(task_t,OUTPUT##_##TASK,OUTPUT##_tasks,&TASK##_##task) */
+void output_buffer_available_impl(buffer_t const* buf);
+rbf_buffer_index_t output_buffer_prepare_impl(buffer_t const* buf);
 
 #define declare_source_buffer(TYPE, NAME) \
 		_ROM_table_import_addr(task_t,NAME##_tasks); \
 		typedef TYPE NAME##_type; \
-		extern volatile rbf_buffer_index_t NAME##_availptr; \
+		extern volatile buffer_ram_t NAME##_usage; \
 		extern NAME##_type NAME##_values[]
 		
 #define define_input_buffer(SRCNAME,BUFFER) \
 		static volatile rbf_buffer_index_t BUFFER; \
 		_ROM_table_entry(volatile rbf_buffer_index_t, SRCNAME##_##TASK##_buf, SRCNAME##_readptrs, &BUFFER); \
-		static rbf_buffer_index_t volatile*const BUFFER##_avail = &SRCNAME##_availptr
+		static rbf_buffer_index_t volatile*const BUFFER##_avail = &SRCNAME##_usage.avail_idx
 		
 // returns RBF_outbuf_invalid when empty (careful: contents of value might change during buffer overflow)
 rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,rbf_buffer_index_t volatile*avail);
@@ -191,5 +188,5 @@ rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,rbf_b
 	input_buffer_read_impl(&BUF,BUF##_avail)
 
 #define buffer_getlast(SRCNAME) \
-	TBD
+	(SRCNAME##_values[SRCNAME##_usage.avail_idx])
 

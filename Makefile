@@ -1,4 +1,4 @@
-CFLAGS=-O0 -g
+CFLAGS=-O0 -g -Wall
 
 all: example0 example1 example2
 
