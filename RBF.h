@@ -172,7 +172,7 @@ rbf_buffer_index_t output_buffer_prepare_impl(buffer_t const* buf);
 		extern NAME##_type NAME##_values[]
 		
 #define define_input_buffer(SRCNAME,BUFFER) \
-		static volatile rbf_buffer_index_t BUFFER; \
+		static volatile rbf_buffer_index_t BUFFER = RBF_outbuf_invalid; \
 		_ROM_table_entry(volatile rbf_buffer_index_t, SRCNAME##_##TASK##_buf, SRCNAME##_readptrs, &BUFFER); \
 		static buffer_t const*const BUFFER##_properties = &SRCNAME##_properties
 		
