@@ -41,19 +41,21 @@ void generator_function(task_t const* t)
 
 define_task(generator, generator_function);
 connect(timer1, generator);
-define_input_buffer(printer_buf);
+
+define_input_buffer(outp1, printer_buf);
 
 void printer_function(task_t const* t)
 {
-	rbf_buffer_index_t val;
-    	for (val=buffer_read(printer_buf); val!=RBF_outbuf_invalid; val=buffer_read(printer_buf))
+	rbf_buffer_index_t idx;
+//    	for (idx= buffer_eval(printer_buf); idx!=RBF_outbuf_invalid; idx=buffer_eval(printer_buf))
+	LOOP_OVER_BUFFER(idx, printer_buf)
 	{
-		putchar(buffer_get(printer_buf,val));
+		putchar(buffer_get(outp1, idx));
 		putchar(' ');
 	}
 	putchar('\n');
 }
 
 define_task(printer, printer_function);
-connect_buffer(outp1, printer, printer_buf);
+connect(outp1, printer);
 
