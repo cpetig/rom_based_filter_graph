@@ -26,10 +26,9 @@ static char next = '@';
 
 void generator_function(task_t const* t)
 {
-	char* o= &output_prepare(outp1);
 	++next;
 	if (next>'Z') next='A';
-	*o= next;
+	output_prepare(outp1)= next;
 	output_available(outp1);
 }
 
@@ -40,7 +39,6 @@ void printer_function(task_t const* t)
 {
     putchar(output_get(outp1));
     putchar('\n');
-//	printf("%c\n", output_get(outp1));
 }
 
 define_task(printer, printer_function);
