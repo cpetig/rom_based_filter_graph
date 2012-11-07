@@ -32,11 +32,10 @@ static mytask_t generator_info = { TASK_RAM_T_INIT_VALUE, '@' };
 
 void generator_function(task_t const* t)
 {
-	char* o= &output_prepare(outp1);
 	char* i= &((mytask_t*)(t->var))->next;
 	++*i;
 	if (*i>'Z') *i='A';
-	*o= *i;
+	output_prepare(outp1)= *i;
 	output_available(outp1);
 }
 

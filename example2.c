@@ -26,16 +26,14 @@ static char next = '@';
 
 void generator_function(task_t const* t)
 {
-	char* o= &output_buffer_prepare(outp1);
 	++next;
 	if (next>'Z') next='A';
-	*o= next;
+	output_buffer_prepare(outp1)= next;
 	output_buffer_available(outp1);
 
-	o= &output_buffer_prepare(outp1);
 	++next;
 	if (next>'Z') next='A';
-	*o= next;
+	output_buffer_prepare(outp1)= next;
 	output_buffer_available(outp1);
 }
 
