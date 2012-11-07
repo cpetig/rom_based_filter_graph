@@ -152,9 +152,9 @@ typedef struct buffer_s
 		_ROM_table_define_addr(volatile rbf_buffer_index_t,NAME##_readptrs); \
 		typedef TYPE NAME##_type; \
 		NAME##_type NAME##_values[SIZE]; \
-		volatile buffer_ram_t NAME##_usage = \
+		static buffer_ram_t NAME##_usage = \
 		{ RBF_outbuf_invalid,RBF_outbuf_invalid }; \
-		static const buffer_t NAME##_properties = \
+		const buffer_t NAME##_properties = \
 		{ &NAME##_usage, (volatile rbf_buffer_index_t*const*)_ROM_table_addr(NAME##_readptrs), _ROM_table_addr(NAME##_tasks), SIZE }
 
 #define output_buffer_available(NAME) \
@@ -168,16 +168,16 @@ rbf_buffer_index_t output_buffer_prepare_impl(buffer_t const* buf);
 #define declare_source_buffer(TYPE, NAME) \
 		_ROM_table_import_addr(task_t,NAME##_tasks); \
 		typedef TYPE NAME##_type; \
-		extern volatile buffer_ram_t NAME##_usage; \
+		extern const buffer_t NAME##_properties; \
 		extern NAME##_type NAME##_values[]
 		
 #define define_input_buffer(SRCNAME,BUFFER) \
 		static volatile rbf_buffer_index_t BUFFER; \
 		_ROM_table_entry(volatile rbf_buffer_index_t, SRCNAME##_##TASK##_buf, SRCNAME##_readptrs, &BUFFER); \
-		static rbf_buffer_index_t volatile*const BUFFER##_avail = &SRCNAME##_usage.avail_idx
+		static buffer_t const*const BUFFER##_properties = &SRCNAME##_properties
 		
 // returns RBF_outbuf_invalid when empty (careful: contents of value might change during buffer overflow)
-rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,rbf_buffer_index_t volatile*avail);
+rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,buffer_t const*props);
 
 #define LOOP_OVER_BUFFER(IDX, BUF) \
     	for (IDX= buffer_eval(BUF); IDX!=RBF_outbuf_invalid; IDX=buffer_eval(BUF))
@@ -185,8 +185,8 @@ rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,rbf_b
 #define buffer_get(SRCNAME,IDX) \
 	(SRCNAME##_values[IDX])
 #define buffer_eval(BUF) \
-	input_buffer_read_impl(&BUF,BUF##_avail)
+	input_buffer_read_impl(&BUF,BUF##_properties)
 
 #define buffer_getlast(SRCNAME) \
-	(SRCNAME##_values[SRCNAME##_usage.avail_idx])
+	(SRCNAME##_values[SRCNAME##_properties.var->avail_idx])
 

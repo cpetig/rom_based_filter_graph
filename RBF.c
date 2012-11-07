@@ -28,19 +28,9 @@ define_event(program_start_src);
 static task_t const* ready_list;
 //static task_t const* current;
 
-void enter_critical_section()
-{
-	// TODO: disable interrupts
-}
-
-void leave_critical_section()
-{
-	// TODO: reenable interrupts
-}
-
 void wake_process(task_t const* t)
 {
-	enter_critical_section();
+	int state= RBF_enter_critical_section();
 	if (t->var->next==ADDR_PROCESSED)
 	{
 		task_t const* last= ready_list;
@@ -53,7 +43,7 @@ void wake_process(task_t const* t)
 		}
 		t->var->next=0;
 	}
-	leave_critical_section();
+	RBF_leave_critical_section(state);
 }
 
 void output_available_impl(task_t const*const* listeners)
@@ -77,11 +67,11 @@ int main()
 		task_t const* first= ready_list;
 		if (!!first)
 		{
-			enter_critical_section();
+			int state= RBF_enter_critical_section();
 			first= ready_list;
 			ready_list= first->var->next;
 			first->var->next= ADDR_PROCESSED;
-			leave_critical_section();
+			RBF_leave_critical_section(state);
 
 			(*(first->fun))(first);
 		}

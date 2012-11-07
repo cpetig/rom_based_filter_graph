@@ -2,7 +2,8 @@ CFLAGS=-O0 -g -Wall
 
 all: example0 example1 example2
 
-COMMONOBJECTS=RBF.o linux_timer.o
+COMMONOBJECTS=RBF.o linux_timer.o linux_crit_sect.o
+COMMONBUFOBJECTS=$(COMMONOBJECTS) RBF_buffer.o
 
 clean:
 	rm example0 *.o
@@ -13,6 +14,6 @@ example0: example0.o $(COMMONOBJECTS)
 example1: example1.o $(COMMONOBJECTS) 
 	$(CC) -o $@ $^
 
-example2: example2.o $(COMMONOBJECTS) 
+example2: example2.o $(COMMONBUFOBJECTS) 
 	$(CC) -o $@ $^
 
