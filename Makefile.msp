@@ -8,15 +8,18 @@ OBJDUMP		= $(MSP_PREFIX)/bin/msp430-objdump
 OBJCOPY		= $(MSP_PREFIX)/bin/msp430-objcopy
 OBJSIZE		= $(MSP_PREFIX)/bin/msp430-size
 
-NAME=example0
+#NAME=example0
+
+NAME=example3
+BUFFER=RBF_buffer.o
 
 all: $(NAME).elf $(NAME).lst $(NAME).hex
 
 clean:
 	rm $(NAME).elf *.o $(NAME).lst $(NAME).hex $(NAME).map *~
 
-$(NAME).elf: $(NAME).o RBF.o msp_timer.o msp_putchar.o
-	$(CC) -o $@ ${CFLAGS} $^ -Wl,$(NAME)_msp.lds -Wl,-Map=$(NAME).map
+$(NAME).elf: $(NAME).o RBF.o msp_timer.o msp_putchar.o msp_crit_sect.o $(BUFFER)
+	$(CC) -o $@ ${CFLAGS} $^ -Wl,msp.lds -Wl,-Map=$(NAME).map
 
 ${NAME}.lst: ${NAME}.elf
 	${OBJDUMP} -dSt $^ >$@
