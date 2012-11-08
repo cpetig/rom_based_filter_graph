@@ -47,16 +47,20 @@ typedef struct timer_s
 
 // internal macros
 #ifdef __GNUC__
+# define RBF_SEC_PREFIX ".text$RBF"
 # define _ROM_table_define_addr(CTYPE,SECTION) \
 	CTYPE const*const RBF_##SECTION##_start[1] \
-	 __attribute__((section(".text$RBF_"#SECTION"0"),used)) = { 0 }
+	 __attribute__((section(RBF_SEC_PREFIX"_"#SECTION"0"),used)) = { 0 }
 # define _ROM_table_import_addr(CTYPE,SECTION) \
 	extern CTYPE const*const RBF_##SECTION##_start[]
 # define _ROM_table_addr(SECTION) \
 	(RBF_##SECTION##_start+1)
 # define _ROM_table_entry(CTYPE,ENTRYPREFIX,SECTION,VALUE) \
 	static CTYPE const*const ENTRYPREFIX##entry \
-	 __attribute__((section(".text$RBF_"#SECTION"1"),used)) = VALUE
+	 __attribute__((section(RBF_SEC_PREFIX"_"#SECTION"1"),used)) = VALUE
+# define _ROM_table_end() \
+        static void const*const RBF_end_entry \
+	__attribute__((section(RBF_SEC_PREFIX"z"),used)) = 0
 #endif
 
 #define _define_RBF_timer(NAME,MILLISECONDS,RELOAD) \

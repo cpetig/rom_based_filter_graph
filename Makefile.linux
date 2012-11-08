@@ -1,16 +1,19 @@
-CFLAGS=-O0 -g
+CFLAGS=-O0 -g -Wall
 
-all: example0
+all: example0 example1 example2 example3
 
-OBJECTS=example0.o RBF.o linux_timer.o
+COMMONOBJECTS=RBF.o linux_timer.o linux_crit_sect.o
+COMMONBUFOBJECTS=$(COMMONOBJECTS) RBF_buffer.o
 
 clean:
 	rm example0 *.o
 
-example0_linux.lds: linux_lds_example0.patch
-	$(LD) --verbose >example0_linux.lds
-	patch <linux_lds_example0.patch
+linux.lds: linux_lds.patch
+	$(LD) --verbose >linux.lds
+	patch <linux_lds.patch
 
-example0: $(OBJECTS) example0_linux.lds
-	$(CC) -o $@ $(OBJECTS) -Wl,-T -Wl,example0_linux.lds -Wl,-Map=example0.map
+example0: example0.o $(COMMONOBJECTS) linux.lds
+	$(CC) -o $@ example0.o $(COMMONOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example0.map
 
+example3: example3.o $(COMMONBUFOBJECTS) linux.lds
+	$(CC) -o $@ example3.o $(COMMONBUFOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example0.map

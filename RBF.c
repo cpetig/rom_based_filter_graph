@@ -105,6 +105,4 @@ void tick_1ms()
 	}
 }
 
-static void const*const RBF_end_entry 
-	__attribute__((section(".text$RBFz"),used)) = 0;
-
+_ROM_table_end();

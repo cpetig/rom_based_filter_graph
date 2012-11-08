@@ -9,3 +9,7 @@ example0.map
 example0_linux.lds
 /example0_cygwin.lds
 /*.exe
+example1
+example2
+example3
+linux.lds

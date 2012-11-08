@@ -1,0 +1,31 @@
+--- linux.lds	2012-11-08 07:48:18.696067478 +0100
++++ linux.lds	2012-11-08 07:53:17.484077994 +0100
+@@ -1,13 +1,3 @@
+-GNU ld (GNU Binutils for Ubuntu) 2.22.90.20120924
+-  Supported emulations:
+-   elf_i386
+-   i386linux
+-   elf32_x86_64
+-   elf_x86_64
+-   elf_l1om
+-   elf_k1om
+-using internal linker script:
+-==================================================
+ /* Script for -z combreloc: combine and sort reloc sections */
+ OUTPUT_FORMAT("elf32-i386", "elf32-i386",
+ 	      "elf32-i386")
+@@ -62,6 +52,7 @@
+     *(.text.startup .text.startup.*)
+     *(.text.hot .text.hot.*)
+     *(.text .stub .text.* .gnu.linkonce.t.*)
++    *(SORT(.text$*))
+     /* .gnu.warning sections are handled specially by elf32.em.  */
+     *(.gnu.warning)
+   }
+@@ -214,6 +205,3 @@
+   .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+   /DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
+ }
+-
+-
+-==================================================
