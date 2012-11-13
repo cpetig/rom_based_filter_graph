@@ -1,0 +1,24 @@
+; Code Composer Project File, Version 2.0 (do not modify or remove this line)
+
+[Project Settings]
+ProjectDir="C:\Documents and Settings\szxn3j\Desktop\iv4-super\RBF\CCStudio33\"
+ProjectType=Executable
+CPUFamily=TMS470R2X
+Tool="Compiler"
+Tool="CustomBuilder"
+Tool="Linker"
+Config="Debug"
+Config="Release"
+
+["Compiler" Settings: "Debug"]
+Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -mv5e --abi=ti_arm9_abi
+
+["Compiler" Settings: "Release"]
+Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -mv5e --abi=ti_arm9_abi
+
+["Linker" Settings: "Debug"]
+Options=-c -m".\Debug\example0.map" -o".\Debug\example0.out" -w -x
+
+["Linker" Settings: "Release"]
+Options=-c -m".\Release\example0.map" -o".\Release\example0.out" -w -x
+
