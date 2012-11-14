@@ -1,11 +1,7 @@
-/example0.sbl
 /Debug
-/example0.CS_
-/cc_build_Debug.log
-/Debug.lkf
+/cc_build_*.log
 /*.paf2
-/cc_build_Release.log
+/*.lkf
 /Release
-/Release.lkf
 /*.sbl
-/*
+/*.CS_
