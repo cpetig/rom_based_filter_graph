@@ -66,7 +66,11 @@ typedef struct timer_s
 // I found no other way to mark a symbol as used
 # define _USE_SYMBOL(CTYPE,ENTRYPREFIX,SYMBOL)	\
 	CTYPE const*const ENTRYPREFIX##entry = &SYMBOL
-# define _SYMBOL_PREFIX "_"
+# ifdef __eabi__
+#  define _SYMBOL_PREFIX
+# else
+#  define _SYMBOL_PREFIX "_"
+# endif
 # define _ROM_table_define_addr(CTYPE,SECTION) \
 	asm(" .global "_SYMBOL_PREFIX "RBF_"#SECTION"_start\n"	\
 		" .sect \""RBF_SEC_PREFIX"_"#SECTION"0\"\n"	\

@@ -20,7 +20,7 @@ Source="..\RBF.c"
 Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -me -mv5e --abi=ti_arm9_abi
 
 ["Compiler" Settings: "Release"]
-Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -mv5e --abi=ti_arm9_abi
+Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -me -mv5e --abi=ti_arm9_abi
 
 ["Linker" Settings: "Debug"]
 Options=-c -m".\Debug\example0.map" -o".\Debug\example0.out" -w -x
