@@ -25,7 +25,7 @@ define_event(program_start_src);
 //#define ADDR_RUNNING 2
 //#define ADDR_KILLED 3
 
-static task_t const* ready_list;
+static task_t const* ready_list=0;
 //static task_t const* current;
 
 void wake_process(task_t const* t)
