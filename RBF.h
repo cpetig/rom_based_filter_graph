@@ -45,7 +45,7 @@ typedef struct timer_s
 	task_t const*const*const listeners; // null terminated list
 } RBF_timer_t;
 
-// internal macros
+/****************** Internal macros start here ********************************************/
 #ifdef __GNUC__
 # define RBF_SEC_PREFIX ".text$RBF"
 # define _ROM_table_define_addr(CTYPE,SECTION) \
@@ -105,7 +105,11 @@ typedef struct timer_s
 	static task_ram_t NAME##_value = TASK_RAM_T_INIT_VALUE; \
 	_define_task4(STORAGE, NAME, FUNCTION, NAME##_value)
 
-// public macros
+void output_available_impl(task_t const*const* listeners);
+// timer tick (should be called with 1ms periodicy)
+void tick_1ms();
+
+/****************** Public interface starts here ********************************************/
 #define define_event(NAME) /* void type output */ \
 		_ROM_table_define_addr(task_t,NAME##_tasks)
 #define define_output(TYPE,NAME) \
@@ -125,14 +129,12 @@ typedef struct timer_s
 #define define_task(NAME, FUNCTION) \
 		_define_task_i3(static, NAME, FUNCTION)
 // a sink is a globally accessible task
-#define define_sink(NAME, FUNCTION) \
-		_define_task_i3(, NAME, FUNCTION)
+/*#define define_sink(NAME, FUNCTION) \
+		_define_task_i3(, NAME, FUNCTION)*/
 
 #define output_prepare(NAME) NAME##_value
 #define output_available(NAME) output_available_impl(_ROM_table_addr(NAME##_tasks))
 #define output_get(NAME) NAME##_value
-//#define output_ref(NAME) &NAME##_value
-//#define output_unref(NAME,PTR) ((void)0)
 
 #define declare_event(NAME) \
 		_ROM_table_import_addr(task_t,NAME##_tasks)
@@ -147,18 +149,13 @@ typedef struct timer_s
 #define restart_timer(NAME, MILLISECONDS) \
 		NAME##_value= MILLISECONDS
 
-// TODO: add more arguments for buffered output support
-void output_available_impl(task_t const*const* listeners);
-// main loop
-void schedule();
-// timer tick
-void tick_1ms();
-
 int RBF_enter_critical_section();
 void RBF_leave_critical_section(int); // pass the value received by enter
 
 declare_event(idle_source);
 declare_event(program_start_src);
+
+/****************** Optional event buffering code starts here ********************************************/
 
 typedef unsigned char rbf_buffer_index_t;
 
