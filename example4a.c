@@ -19,4 +19,50 @@
 #include <stdio.h>
 #include "RBF_sink.h"
 
+define_output_buffer(char,outp1,2);
+define_interval_timer(timer1,33);
 
+static char next = '@';
+
+static void generator_function(task_t const* t)
+{
+    unsigned i;
+    
+    for (i=0;i<3;++i)
+    {
+		++next;
+		if (next>'Z') next='A';
+		output_buffer_prepare(outp1)= next;
+		output_buffer_available(outp1);
+    }
+}
+
+define_task(generator, generator_function);
+connect(timer1, generator);
+
+define_sink(char, printer);
+connect_sink(outp1, printer);
+
+#if 0 // is this worth the trouble?
+void printer_function(char const* value)
+{
+	putchar(*value);
+	putchar('\n');
+}
+
+sink_calls(printer, printer_function);
+
+#else
+void printer_function(task_t const* t)
+{
+	char const* value;
+	LOOP_OVER_SINK(value, printer)
+	{
+		putchar(*value);
+		putchar(' ');
+	}
+	putchar('\n');
+}
+
+sink_implementation(printer, printer_function);
+#endif

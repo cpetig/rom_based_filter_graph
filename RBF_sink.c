@@ -17,3 +17,16 @@
 */
 
 #include "RBF_sink.h"
+
+// read next value from all connected output->input buffers
+void* RBF_sink_read(RBF_sink_connection_t const*const* table)
+{
+	while (!!*table)
+	{
+		rbf_buffer_index_t idx= input_buffer_read_impl((*table)->input, (*table)->output);
+		if (idx!=RBF_outbuf_invalid)
+			return ((char*)((*table)->output_values))+idx*(*table)->elem_size;
+		++table;
+	}
+	return 0;
+}

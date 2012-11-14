@@ -16,6 +16,31 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+// this example file demonstrates cross file event propagation using declare statements
+
 #include <stdio.h>
 #include "RBF_sink.h"
 
+declare_event(timer1);
+declare_sink(char,printer);
+
+define_output_buffer(char,outp2,2);
+connect_sink(outp2,printer);
+
+static char next = 'N';
+
+static void generator_function(task_t const* t)
+{
+    unsigned i;
+    
+    for (i=0;i<3;++i)
+    {
+		++next;
+		if (next>'Z') next='A';
+		output_buffer_prepare(outp2)= next;
+		output_buffer_available(outp2);
+    }
+}
+
+define_task(generator2, generator_function);
+connect(timer1, generator2);

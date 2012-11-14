@@ -142,8 +142,8 @@ void tick_1ms();
 		declare_event(NAME); \
 		typedef TYPE NAME##_type; \
 		extern NAME##_type NAME##_value
-#define declare_sink(NAME) \
-		extern const task_t NAME##_task
+//#define declare_sink(NAME) \
+//		extern const task_t NAME##_task
 #define stop_timer(NAME) \
 		NAME##_value= 0
 #define restart_timer(NAME, MILLISECONDS) \
