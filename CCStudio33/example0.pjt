@@ -10,8 +10,14 @@ Tool="Linker"
 Config="Debug"
 Config="Release"
 
+[Source Files]
+Source="..\ARM9_crit_sect.c"
+Source="..\dummy_timer.c"
+Source="..\example0.c"
+Source="..\RBF.c"
+
 ["Compiler" Settings: "Debug"]
-Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -mv5e --abi=ti_arm9_abi
+Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -me -mv5e --abi=ti_arm9_abi
 
 ["Compiler" Settings: "Release"]
 Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -mv5e --abi=ti_arm9_abi

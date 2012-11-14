@@ -55,26 +55,32 @@ typedef struct timer_s
 	extern CTYPE const*const RBF_##SECTION##_start[]
 # define _ROM_table_addr(SECTION) \
 	(RBF_##SECTION##_start+1)
-# define _ROM_table_entry(CTYPE,ENTRYPREFIX,SECTION,VALUE) \
+# define _ROM_table_entry(CTYPE,ENTRYPREFIX,SECTION,SYMBOL) \
 	static CTYPE const*const ENTRYPREFIX##entry \
-	 __attribute__((section(RBF_SEC_PREFIX"_"#SECTION"1"),used)) = VALUE
+	 __attribute__((section(RBF_SEC_PREFIX"_"#SECTION"1"),used)) = &SYMBOL
 # define _ROM_table_end() \
         static void const*const RBF_end_entry \
 	__attribute__((section(RBF_SEC_PREFIX"z"),used)) = 0
 #elif defined(__TI_COMPILER_VERSION__)
 # define RBF_SEC_PREFIX ".text:RBF"
+// I found no other way to mark a symbol as used
+# define _USE_SYMBOL(CTYPE,ENTRYPREFIX,SYMBOL)	\
+	CTYPE const*const ENTRYPREFIX##entry = &SYMBOL
+# define _SYMBOL_PREFIX "_"
 # define _ROM_table_define_addr(CTYPE,SECTION) \
-	asm(" .sect \""RBF_SEC_PREFIX"_"#SECTION"0\"\n"	\
-		"RBF_"#SECTION"_start:\n"	\
+	asm(" .global "_SYMBOL_PREFIX "RBF_"#SECTION"_start\n"	\
+		" .sect \""RBF_SEC_PREFIX"_"#SECTION"0\"\n"	\
+		_SYMBOL_PREFIX "RBF_"#SECTION"_start:\n"	\
 		" .word 0\n");	\
 	extern CTYPE const*const RBF_##SECTION##_start[]
 # define _ROM_table_import_addr(CTYPE,SECTION) \
 	extern CTYPE const*const RBF_##SECTION##_start[]
 # define _ROM_table_addr(SECTION) \
 	(RBF_##SECTION##_start+1)
-# define _ROM_table_entry(CTYPE,ENTRYPREFIX,SECTION,VALUE) \
+# define _ROM_table_entry(CTYPE,ENTRYPREFIX,SECTION,SYMBOL) \
 	asm(" .sect \""RBF_SEC_PREFIX"_"#SECTION"1\"\n"	\
-		" .word "#VALUE"\n")
+		" .word "_SYMBOL_PREFIX #SYMBOL"\n");	\
+	_USE_SYMBOL(CTYPE,ENTRYPREFIX,SYMBOL)
 # define _ROM_table_end() \
 	asm(" .sect \""RBF_SEC_PREFIX"z\"\n"	\
 		" .word 0\n")
@@ -86,7 +92,7 @@ typedef struct timer_s
 	static const RBF_timer_t NAME##_timer = \
 	{ &NAME##_value, RELOAD, \
 	  _ROM_table_addr(NAME##_tasks) }; \
-	_ROM_table_entry(RBF_timer_t,NAME##_timer,timers,&NAME##_##timer)
+	_ROM_table_entry(RBF_timer_t,NAME##_timer,timers,NAME##_##timer)
 
 #define _define_task4(STORAGE, NAME, FUNCTION, RAM) \
 	STORAGE const task_t NAME##_task = \
@@ -108,7 +114,7 @@ typedef struct timer_s
 		_define_RBF_timer(NAME,MILLISECONDS,0)
 
 #define connect(OUTPUT,TASK) \
-		_ROM_table_entry(task_t,OUTPUT##_##TASK,OUTPUT##_tasks,&TASK##_##task)
+		_ROM_table_entry(task_t,OUTPUT##_##TASK,OUTPUT##_tasks,TASK##_##task)
 
 #define define_task3(NAME, FUNCTION, RAM) \
 		_define_task4(static, NAME, FUNCTION, RAM)
@@ -194,7 +200,7 @@ rbf_buffer_index_t output_buffer_prepare_impl(buffer_t const* buf);
 		
 #define define_input_buffer(SRCNAME,BUFFER) \
 		static volatile rbf_buffer_index_t BUFFER = RBF_outbuf_invalid; \
-		_ROM_table_entry(volatile rbf_buffer_index_t, SRCNAME##_##TASK##_buf, SRCNAME##_readptrs, &BUFFER); \
+		_ROM_table_entry(volatile rbf_buffer_index_t, SRCNAME##_##TASK##_buf, SRCNAME##_readptrs, BUFFER); \
 		static buffer_t const*const BUFFER##_properties = &SRCNAME##_properties
 		
 // returns RBF_outbuf_invalid when empty (careful: contents of value might change during buffer overflow)
