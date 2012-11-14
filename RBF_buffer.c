@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "RBF.h"
+#include "RBF_buffer.h"
 
 rbf_buffer_index_t input_buffer_read_impl(rbf_buffer_index_t volatile*read,buffer_t const*props)
 {

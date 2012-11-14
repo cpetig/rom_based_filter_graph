@@ -1,0 +1,31 @@
+; Code Composer Project File, Version 2.0 (do not modify or remove this line)
+
+[Project Settings]
+ProjectDir="C:\Documents and Settings\szxn3j\Desktop\iv4-super\RBF\CCStudio33\"
+ProjectType=Executable
+CPUFamily=TMS470R2X
+Tool="Compiler"
+Tool="CustomBuilder"
+Tool="Linker"
+Config="Debug"
+Config="Release"
+
+[Source Files]
+Source="..\ARM9_crit_sect.c"
+Source="..\dummy_timer.c"
+Source="..\example3.c"
+Source="..\RBF.c"
+Source="..\RBF_buffer.c"
+
+["Compiler" Settings: "Debug"]
+Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -me -mv5e --abi=ti_arm9_abi
+
+["Compiler" Settings: "Release"]
+Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -me -mv5e --abi=ti_arm9_abi
+
+["Linker" Settings: "Debug"]
+Options=-c -m".\Debug\example3.map" -o".\Debug\example3.out" -w -x
+
+["Linker" Settings: "Release"]
+Options=-c -m".\Release\example3.map" -o".\Release\example3.out" -w -x
+
