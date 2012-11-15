@@ -46,7 +46,7 @@ typedef struct timer_s
 } RBF_timer_t;
 
 /****************** Internal macros start here ********************************************/
-#ifdef __GNUC__
+#if defined (__GNUC__) /*|| __TI_GNU_ATTRIBUTE_SUPPORT__*/
 # define RBF_SEC_PREFIX ".text$RBF"
 # define _ROM_table_define_addr(CTYPE,SECTION) \
 	CTYPE const*const RBF_##SECTION##_start[1] \

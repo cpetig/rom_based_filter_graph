@@ -9,6 +9,7 @@ Tool="CustomBuilder"
 Tool="Linker"
 Config="Debug"
 Config="Release"
+Config="Release_ELF"
 
 [Source Files]
 Source="..\ARM9_crit_sect.c"
@@ -25,9 +26,15 @@ Options=-g -pdsw225 -fr"$(Proj_dir)\Debug" -d"_DEBUG" -me -mv5e --abi=ti_arm9_ab
 ["Compiler" Settings: "Release"]
 Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -me -mv5e --abi=ti_arm9_abi
 
+["Compiler" Settings: "Release_ELF"]
+Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release_ELF" -me -mv5e --abi=eabi --code_state=16 --gcc --elf
+
 ["Linker" Settings: "Debug"]
 Options=-c -m".\Debug\example4.map" -o".\Debug\example4.out" -w -x
 
 ["Linker" Settings: "Release"]
 Options=-c -m".\Release\example4.map" -o".\Release\example4.out" -w -x
+
+["Linker" Settings: "Release_ELF"]
+Options=--abi=eabi -c -m".\Release_ELF\example4.map" -o".\Release_ELF\example4.out" -w -x
 

@@ -20,11 +20,20 @@
 
 int RBF_enter_critical_section()
 {
+#ifdef __16bis__
+	/* TODO: some assembly tricks */
+	return 0;
+#else
 	return _disable_interrupts();
+#endif
 }
 
 void RBF_leave_critical_section(int val)
 {
+#ifdef __16bis__
+	/* TODO: some assembly tricks */
+#else
 	_set_CPSR(val);
 //    _restore_interupts(val);
+#endif
 }
