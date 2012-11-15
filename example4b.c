@@ -21,7 +21,8 @@
 #include <stdio.h>
 #include "RBF_sink.h"
 
-declare_event(timer1);
+//declare_event(timer1);
+define_interval_timer(timer2,16);
 declare_sink(char,printer);
 
 define_output_buffer(char,outp2,2);
@@ -43,4 +44,4 @@ static void generator_function(task_t const* t)
 }
 
 define_task(generator2, generator_function);
-connect(timer1, generator2);
+connect(timer2, generator2);

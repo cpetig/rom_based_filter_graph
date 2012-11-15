@@ -20,7 +20,7 @@
 #include "RBF_sink.h"
 
 define_output_buffer(char,outp1,2);
-define_interval_timer(timer1,33);
+define_interval_timer(timer1,32);
 
 static char next = '@';
 
