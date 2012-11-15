@@ -1,9 +1,10 @@
 CFLAGS=-O0 -g -Wall
 
-all: example0 example1 example2 example3
+all: example0 example1 example2 example3 example4
 
 COMMONOBJECTS=RBF.o linux_timer.o linux_crit_sect.o
 COMMONBUFOBJECTS=$(COMMONOBJECTS) RBF_buffer.o
+COMMONSINKOBJECTS=$(COMMONBUFOBJECTS) RBF_sink.o
 
 clean:
 	rm example0 *.o
@@ -16,4 +17,7 @@ example0: example0.o $(COMMONOBJECTS) linux.lds
 	$(CC) -o $@ example0.o $(COMMONOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example0.map
 
 example3: example3.o $(COMMONBUFOBJECTS) linux.lds
-	$(CC) -o $@ example3.o $(COMMONBUFOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example0.map
+	$(CC) -o $@ example3.o $(COMMONBUFOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example3.map
+
+example4: example4a.o example4b.o $(COMMONSINKOBJECTS) linux.lds
+	$(CC) -o $@ example4a.o example4b.o $(COMMONSINKOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example4.map
