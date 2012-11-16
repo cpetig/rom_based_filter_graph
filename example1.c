@@ -20,7 +20,8 @@
 #include "RBF.h"
 
 define_output(char,outp1);
-define_interval_timer(timer1,33);
+define_interval_timer(timer1,61);
+define_interval_timer(timer2,30);
 
 typedef struct mytask_s
 {
@@ -29,6 +30,7 @@ typedef struct mytask_s
 } mytask_t;
 
 static mytask_t generator_info = { TASK_RAM_T_INIT_VALUE, '@' };
+static mytask_t generator_info2 = { TASK_RAM_T_INIT_VALUE, 'N' };
 
 void generator_function(task_t const* t)
 {
@@ -41,6 +43,8 @@ void generator_function(task_t const* t)
 
 define_task3(generator, generator_function, generator_info);
 connect(timer1, generator);
+define_task3(generator2, generator_function, generator_info2);
+connect(timer2, generator2);
 
 void printer_function(task_t const* t)
 {
