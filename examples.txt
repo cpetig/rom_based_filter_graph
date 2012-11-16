@@ -1,0 +1,5 @@
+Example 0: Most simple: One task sending characters, one task printing them
+Example 1: Task specific variables (e.g. if you want to reuse the same function for independent tasks)
+Example 2: Buffering
+Example 3: Overflowing output buffers (first out of five events is missed)
+Example 4: Two buffers independently feeding a sink
