@@ -128,9 +128,6 @@ void tick_1ms();
 		_define_task4(static, NAME, FUNCTION, RAM)
 #define define_task(NAME, FUNCTION) \
 		_define_task_i3(static, NAME, FUNCTION)
-// a sink is a globally accessible task
-/*#define define_sink(NAME, FUNCTION) \
-		_define_task_i3(, NAME, FUNCTION)*/
 
 #define output_prepare(NAME) NAME##_value
 #define output_available(NAME) output_available_impl(_ROM_table_addr(NAME##_tasks))
