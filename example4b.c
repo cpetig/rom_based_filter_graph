@@ -28,7 +28,7 @@ declare_sink(char,printer);
 define_output_buffer(char,outp2,2);
 connect_sink(outp2,printer);
 
-static char next = 'N';
+static char next = 'n';
 
 static void generator_function(task_t const* t)
 {
@@ -37,7 +37,7 @@ static void generator_function(task_t const* t)
     for (i=0;i<3;++i)
     {
 		++next;
-		if (next>'Z') next='A';
+		if (next>'z') next='a';
 		output_buffer_prepare(outp2)= next;
 		output_buffer_available(outp2);
     }

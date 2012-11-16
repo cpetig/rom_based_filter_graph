@@ -4,6 +4,7 @@ all: example0 example1 example2 example3
 
 COMMONOBJECTS=RBF.o linux_timer.o linux_crit_sect.o
 COMMONBUFOBJECTS=$(COMMONOBJECTS) RBF_buffer.o
+COMMONSINKOBJECTS=$(COMMONBUFOBJECTS) RBF_sink.o
 
 clean:
 	rm example0 *.o
@@ -18,5 +19,8 @@ example2: example2.o $(COMMONBUFOBJECTS)
 	$(CC) -o $@ $^
 
 example3: example3.o $(COMMONBUFOBJECTS) 
+	$(CC) -o $@ $^
+
+example4: example4a.o example4b.o $(COMMONSINKOBJECTS) 
 	$(CC) -o $@ $^
 

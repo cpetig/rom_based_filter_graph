@@ -28,7 +28,7 @@ static void generator_function(task_t const* t)
 {
     unsigned i;
     
-    for (i=0;i<3;++i)
+    for (i=0;i<2;++i)
     {
 		++next;
 		if (next>'Z') next='A';
