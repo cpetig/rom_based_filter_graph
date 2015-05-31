@@ -17,7 +17,8 @@
 */
 
 #include <stdio.h>
-#include "RBF.h"
+//#include "RBF.h"
+#include "RBF_buffer.h"
 
 define_output_buffer(char,outp1,10);
 define_interval_timer(timer1,33);

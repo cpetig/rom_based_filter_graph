@@ -7,7 +7,7 @@ COMMONBUFOBJECTS=$(COMMONOBJECTS) RBF_buffer.o
 COMMONSINKOBJECTS=$(COMMONBUFOBJECTS) RBF_sink.o
 
 clean:
-	rm example0 *.o
+	rm example0 example1 example2 example3 example4 example?.map *.o
 
 linux.lds: linux_lds.patch
 	$(LD) --verbose >linux.lds
@@ -15,6 +15,12 @@ linux.lds: linux_lds.patch
 
 example0: example0.o $(COMMONOBJECTS) linux.lds
 	$(CC) -o $@ example0.o $(COMMONOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example0.map
+
+example1: example1.o $(COMMONOBJECTS) linux.lds
+	$(CC) -o $@ example1.o $(COMMONOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example1.map
+
+example2: example2.o RBF_buffer.o $(COMMONOBJECTS) linux.lds
+	$(CC) -o $@ example2.o RBF_buffer.o $(COMMONOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example2.map
 
 example3: example3.o $(COMMONBUFOBJECTS) linux.lds
 	$(CC) -o $@ example3.o $(COMMONBUFOBJECTS) -Wl,-T -Wl,linux.lds -Wl,-Map=example3.map
